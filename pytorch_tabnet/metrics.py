@@ -32,11 +32,11 @@ def UnsupervisedLoss(y_pred, embedded_x, obf_vars, eps=1e-9):
     Returns
     -------
     loss : torch float
-        Unsupervised loss, average value over batch samples.    
+        Unsupervised loss, average value over batch samples.
     """
     errors = y_pred - embedded_x
-    reconstruction_errors = torch.mul(errors, obf_vars)**2
-    batch_stds = torch.std(embedded_x, dim=0)**2 + eps
+    reconstruction_errors = torch.mul(errors, obf_vars) ** 2
+    batch_stds = torch.std(embedded_x, dim=0) ** 2 + eps
     features_loss = torch.matmul(reconstruction_errors, 1 / batch_stds)
     # compute the number of non-obfuscated variables
     nb_used_variables = torch.sum(1 - obf_vars, dim=1)
@@ -168,7 +168,9 @@ class Metric:
         available_names = [metric()._name for metric in available_metrics]
         metrics = []
         for name in names:
-            assert name in available_names, f"{name} is not available, choose in {available_names}"
+            assert (
+                name in available_names
+            ), f"{name} is not available, choose in {available_names}"
             idx = available_names.index(name)
             metric = available_metrics[idx]()
             metrics.append(metric)

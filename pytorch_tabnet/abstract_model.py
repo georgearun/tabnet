@@ -31,6 +31,7 @@ import zipfile
 import warnings
 import copy
 
+
 @dataclass
 class TabModel(BaseEstimator):
     """ Class for TabNet model."""
@@ -74,22 +75,24 @@ class TabModel(BaseEstimator):
         If does not already exists, creates it.
         Otherwise overwrite with warnings.
         """
-        update_list = ["cat_dims",
-                       "cat_emb_dim",
-                       "cat_idxs",
-                       "input_dim",
-                       "mask_type",
-                       "n_a",
-                       "n_d",
-                       "n_independent",
-                       "n_shared",
-                       "n_steps"]
+        update_list = [
+            "cat_dims",
+            "cat_emb_dim",
+            "cat_idxs",
+            "input_dim",
+            "mask_type",
+            "n_a",
+            "n_d",
+            "n_independent",
+            "n_shared",
+            "n_steps",
+        ]
         for var_name, value in kwargs.items():
             if var_name in update_list:
                 try:
                     exec(f"global previous_val; previous_val = self.{var_name}")
-                    if previous_val != value: # noqa
-                        wrn_msg = f"Pretraining: {var_name} changed from {previous_val} to {value}" # noqa
+                    if previous_val != value:  # noqa
+                        wrn_msg = f"Pretraining: {var_name} changed from {previous_val} to {value}"  # noqa
                         warnings.warn(wrn_msg)
                         exec(f"self.{var_name} = value")
                 except AttributeError:
@@ -112,7 +115,7 @@ class TabModel(BaseEstimator):
         drop_last=False,
         callbacks=None,
         pin_memory=True,
-        from_unsupervised=None
+        from_unsupervised=None,
     ):
         """Train a neural network stored in self.network
         Using train_dataloader for training data and
@@ -196,7 +199,7 @@ class TabModel(BaseEstimator):
             # Update parameters to match self pretraining
             self.__update__(**from_unsupervised.get_params())
 
-        if not hasattr(self, 'network'):
+        if not hasattr(self, "network"):
             self._set_network()
         self._set_metrics(eval_metric, eval_names)
         self._set_optimizer()
@@ -318,7 +321,7 @@ class TabModel(BaseEstimator):
     def load_weights_from_unsupervised(self, unsupervised_model):
         update_state_dict = copy.deepcopy(self.network.state_dict())
         for param, weights in unsupervised_model.network.state_dict().items():
-            if param.startswith('encoder'):
+            if param.startswith("encoder"):
                 # Convert encoder's layers name to match
                 new_param = "tabnet." + param
             else:
