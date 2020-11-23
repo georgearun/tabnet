@@ -201,6 +201,7 @@ class TabModel(BaseEstimator):
 
         if not hasattr(self, "network"):
             self._set_network()
+        self._update_network_params()
         self._set_metrics(eval_metric, eval_names)
         self._set_optimizer()
         self._set_callbacks(callbacks)
@@ -688,6 +689,9 @@ class TabModel(BaseEstimator):
             feature_importances_, self.reducing_matrix
         )
         self.feature_importances_ = feature_importances_ / np.sum(feature_importances_)
+
+    def _update_network_params(self):
+        self.network.virtual_batch_size = self.virtual_batch_size
 
     @abstractmethod
     def update_fit_params(self, X_train, y_train, eval_set, weights):
