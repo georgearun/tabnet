@@ -24,7 +24,7 @@ def UnsupervisedLoss(y_pred, embedded_x, obf_vars, eps=1e-9):
         Orginal input embedded by network
     obf_vars : torch.Tensor
         Binary mask for obfuscated variables.
-        1 means the variables was obfuscated so reconstruction is based on this.
+        1 means the variable was obfuscated so reconstruction is based on this.
     eps : float
         A small floating point to avoid ZeroDivisionError
         This can happen in degenerated case when a feature has only one value
@@ -38,6 +38,12 @@ def UnsupervisedLoss(y_pred, embedded_x, obf_vars, eps=1e-9):
     reconstruction_errors = torch.mul(errors, obf_vars)**2
     batch_stds = torch.std(embedded_x, dim=0)**2 + eps
     features_loss = torch.matmul(reconstruction_errors, 1 / batch_stds)
+    # compute the number of non-obfuscated variables
+    nb_used_variables = torch.sum(1 - obf_vars, dim=1)
+    # print(nb_used_variables)
+    # take the mean of the used variable errors
+    # print(features_loss)
+    features_loss = features_loss / (1 + nb_used_variables)
     # here we take the mean per batch, contrary to the paper
     loss = torch.mean(features_loss)
     return loss
